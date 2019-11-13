@@ -1,10 +1,13 @@
-import 'dart:ffi';
+//import 'dart:ffi';
+
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:formvalidation/src/models/producto_model.dart';
 //import 'package:formvalidation/src/providers/productos_providers.dart';
 import 'package:formvalidation/src/providers/productos_providers.dart' as prefix0;
 import 'package:formvalidation/src/utils/utils.dart' as utils;
+import 'package:image_picker/image_picker.dart';
 
 class ProductoPage extends StatefulWidget {
 
@@ -19,6 +22,7 @@ class _ProductoPageState extends State<ProductoPage> {
 
   ProductoModel producto = new ProductoModel();
   bool _guardando = false;
+  File foto;
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +39,11 @@ class _ProductoPageState extends State<ProductoPage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.photo_size_select_actual),
-            onPressed: (){},
+            onPressed: _seleccionarFoto,
           ),
           IconButton(
             icon: Icon(Icons.camera_alt),
-            onPressed: (){},
+            onPressed: _tomarFoto,
           ),
         ],
       ),
@@ -50,6 +54,7 @@ class _ProductoPageState extends State<ProductoPage> {
             key: formKey,
             child: Column(
               children: <Widget>[
+                _mostrarFoto(),
                 _crearProducto(),
                 _crearPrecio(),
                 _crearDisponible(),
@@ -154,6 +159,38 @@ class _ProductoPageState extends State<ProductoPage> {
     );
 
     scaffoldKey.currentState.showSnackBar(snackbar);
+  }
+
+  Widget _mostrarFoto(){
+    if (producto.fotoUrl != null){
+      //tarea: Hacer esto
+      return Container();
+    } else {
+      return Image(
+        image: AssetImage(foto?.path ?? 'assets/no-image.png'),
+        height: 300.0,
+        fit: BoxFit.cover,
+      );
+    }
+  }
+
+  _seleccionarFoto() async {
+    _procesarImagen(ImageSource.gallery);
+
+  }
+  _tomarFoto() async {
+    _procesarImagen(ImageSource.camera);
+  }
+
+  _procesarImagen(ImageSource origen) async {
+    foto = await ImagePicker.pickImage(
+      source: origen
+    );
+
+    if ( foto != null) {
+      //limpieza
+    }
+    setState(() {});
   }
 
 }
