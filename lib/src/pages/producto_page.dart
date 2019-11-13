@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:formvalidation/src/models/producto_model.dart';
 //import 'package:formvalidation/src/providers/productos_providers.dart';
@@ -11,10 +13,12 @@ class ProductoPage extends StatefulWidget {
 }
 
 class _ProductoPageState extends State<ProductoPage> {
-  final formKey = GlobalKey<FormState>();
+  final formKey     = GlobalKey<FormState>();
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   final productoProvider = new prefix0.ProductosProvider();
 
   ProductoModel producto = new ProductoModel();
+  bool _guardando = false;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +29,7 @@ class _ProductoPageState extends State<ProductoPage> {
     }
 
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: Text('Producto'),
         actions: <Widget>[
@@ -113,7 +118,7 @@ class _ProductoPageState extends State<ProductoPage> {
       textColor: Colors.white,
       label: Text('Guardar'),
       icon: Icon(Icons.save),
-      onPressed: _submit,
+      onPressed: (_guardando) ? null : _submit,
 
     );
   }
@@ -123,14 +128,32 @@ class _ProductoPageState extends State<ProductoPage> {
 
     formKey.currentState.save();
 
-    print(producto.titulo);
-    print(producto.valor);
-    print(producto.disponible);
+    setState(() {
+      _guardando = true;
+    });
 
     if (producto.id == null){
       productoProvider.crearProducto(producto);
     } else {
       productoProvider.editarProducto(producto);
     }
+
+   setState(() {
+      _guardando = false;
+    });
+    mostrarSnackbar('Registro guardado');
+
+    Navigator.pop(context);
+    
   }
+
+  void mostrarSnackbar(String mensaje){
+    final snackbar = SnackBar(
+      content: Text( mensaje ),
+      duration: Duration(milliseconds: 1500),
+    );
+
+    scaffoldKey.currentState.showSnackBar(snackbar);
+  }
+
 }
